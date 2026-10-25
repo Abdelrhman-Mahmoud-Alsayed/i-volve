@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: ivolve
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    volumes:
+      - db_mysql:/var/lib/mysql
+    networks:
+      - ivolve-net
+
+  app:
+    build: .
+    container_name: node-app
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: appuser
+      DB_PASSWORD: apppass
+      DB_PORT: 3306
+    ports:
+      - "3000:3000"
+    volumes:
+      - app_logs:/app/logs
+    networks:
+      - ivolve-net
+
+volumes:
+  app_logs:
+  db_mysql:
+
+networks:
+  ivolve-net:
+    driver: bridge
